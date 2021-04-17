@@ -63,39 +63,22 @@ class MovementPatternService
         if ($deltaTimeSpawn >= MovementPattern::SPAWN_FREQUENCY) {
             $spawned = true;
             while ($deltaTimeSpawn > 0) {
-                $file = fopen('/var/www/runtime/logs/debug.log', "a+");
-
-                $tmp = [
-                    'delta' => $deltaTimeSpawn,
-                    'delta_minus' => $deltaTimeSpawn - MovementPattern::SPAWN_FREQUENCY,
-                ];
-
                 $deltaTimeSpawn -= MovementPattern::SPAWN_FREQUENCY;
                 $deltaTimeSpawn = max($deltaTimeSpawn, 0);
-
-                $tmp['final_delta'] = $deltaTimeSpawn;
 
                 $carForward = $this->createTransport($movementPattern, LaneDirection::DIRECTION_FORWARD);
 
                 if ($carForward) {
-                    $tmp['car_f_start'] = $carForward->getLocation()->getLocation()->x;
                     $carForward->move($deltaTimeSpawn);
                     $this->removeTransportIfLeftRoad($carForward, $movementPattern);
-                    $tmp['car_f_pos'] = $carForward->getLocation()->getLocation()->x;
                 }
 
                 $carBackward = $this->createTransport($movementPattern, LaneDirection::DIRECTION_BACKWARD);
 
                 if ($carBackward) {
-                    $tmp['car_b_start'] = $carBackward->getLocation()->getLocation()->x;
                     $carBackward->move($deltaTimeSpawn);
                     $this->removeTransportIfLeftRoad($carBackward, $movementPattern);
-                    $tmp['car_b_pos'] = $carBackward->getLocation()->getLocation()->x;
                 }
-
-                fwrite($file, json_encode($tmp) . "\n");
-
-                fclose($file);
             }
         }
 
