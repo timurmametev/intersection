@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  nginx:
+    container_name: intersection_nginx
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/hosts:/etc/nginx/conf.d
+      - .:/var/www
+      - ./docker/logs:/var/log/nginx
+    links:
+      - php
+  php:
+    container_name: intersection_php
+    build: ./docker/images/php
+    restart: always
+    volumes:
+      - .:/var/www:cached
+  server:
+    container_name: intersection_server
+    build: ./docker/images/server
+    restart: always
+    expose:
+      - 8000
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/var/www:cached
+
