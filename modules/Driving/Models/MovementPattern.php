@@ -12,7 +12,7 @@ class MovementPattern
     /**
      * Частота появления транспорта на полосе в секунду
      */
-    public const SPAWN_FREQUENCY = 1;
+    public const SPAWN_FREQUENCY = 5;
 
     /**
      * @var Road

@@ -33,6 +33,11 @@ class DrivingEvent implements MessageComponentInterface
     protected $lastMove;
 
     /**
+     * @var DateTime
+     */
+    protected $lastSpawn;
+
+    /**
      * @var MovementPattern
      */
     private $pattern;
@@ -45,6 +50,8 @@ class DrivingEvent implements MessageComponentInterface
      */
     public function __construct(SplObjectStorage $objectStorage, MovementPatternService $movementPattern)
     {
+        $this->lastMove = new DateTime();
+        $this->lastSpawn = new DateTime();
         $this->clients = $objectStorage;
         $this->movementPatternService = $movementPattern;
     }
@@ -82,24 +89,27 @@ class DrivingEvent implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg)
     {
         if ($msg == 'getMovementPattern') {
+            if ($this->pattern) {
+                $spawned = $this->movementPatternService->updateMovementPattern(
+                    $this->pattern,
+                    $this->lastMove,
+                    $this->lastSpawn
+                );
 
-            $this->lastMove = new DateTime();
-
-            $this->pattern = $this->pattern
-                ? $this->movementPatternService->updateMovementPattern($this->pattern, $this->lastMove)
-                : $this->movementPatternService->createDefaultMovementPattern();
-
-            /*if ($this->pattern) {
-                $this->movementPatternService->updateMovementPattern($this->pattern, $this->lastMove);
+                if ($spawned) {
+                    $this->lastSpawn = new DateTime();
+                }
             } else {
                 $this->pattern = $this->movementPatternService->createDefaultMovementPattern();
-            }*/
+            }
 
             $response = $this->movementPatternService->prepareResponseData($this->pattern);
 
             foreach ($this->clients as $client) {
                 $client->send(json_encode($response));
             }
+
+            $this->lastMove = new DateTime();
         }
     }
 }

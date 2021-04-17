@@ -7,7 +7,6 @@ use app\modules\Driving\Models\Characteristic\TransportSpeed;
 use app\modules\Driving\Models\Road\LaneState;
 use app\modules\Driving\Models\Road\Road;
 use app\modules\Driving\Models\Transport\TransportState;
-use Yii;
 
 class TransportStateRepository
 {

@@ -107,7 +107,7 @@ class TransportState
     {
         $location = $this->location->getLocation();
 
-        $location->x = $deltaTime * $this->speed
+        $location->x += $deltaTime * $this->speed->getValue()
             * LaneDirection::getDirectionMultiplier($this->lane->getDirection());
 
         $this->location->setLocation($location);
